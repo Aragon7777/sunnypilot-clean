@@ -300,9 +300,9 @@ class LongitudinalMpc:
       if (v_lead0 - v_ego >= 0) and (v_lead1 - v_ego >= 0):
         j_ego_v_ego = np.interp(v_ego, v_ego_bps, [0.10, 1.0])
         a_change_v_ego = np.interp(v_ego, v_ego_bps, [0.10, 1.0])
-      print(f"Fast Take-Off Enabled: j_ego_v_ego={j_ego_v_ego}, a_change_v_ego={a_change_v_ego}, v_ego={v_ego}")
-    else:
-      print("Fast Take-Off Disabled")
+      #print(f"Fast Take-Off Enabled: j_ego_v_ego={j_ego_v_ego}, a_change_v_ego={a_change_v_ego}, v_ego={v_ego}")
+    #else:
+      #print("Fast Take-Off Disabled")
 
     if self.mode == 'acc':
       a_change_cost = A_CHANGE_COST if prev_accel_constraint else 0

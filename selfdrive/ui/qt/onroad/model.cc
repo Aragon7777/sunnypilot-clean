@@ -106,9 +106,18 @@ void ModelRenderer::drawLaneLines(QPainter &painter) {
 }
 
 void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reader &model, int height) {
-  QLinearGradient bg(0, height, 0, 0);
   auto *s = uiState();
   auto &sm = *(s->sm);
+  const auto long_plan_sp = sm["longitudinalPlanSP"].getLongitudinalPlanSP();
+
+  // Extract DynamicExperimentalControl
+  const auto& dynamic_control = long_plan_sp.getDec(); // getDynamicExperimentalControl()
+
+  // Check the conditions for experimental mode path
+  bool exp_mode_path = (dynamic_control.getEnabled() && dynamic_control.getState() == cereal::LongitudinalPlanSP::DynamicExperimentalControl::DynamicExperimentalControlState::BLENDED) ||
+                     (!dynamic_control.getEnabled() && sm["selfdriveState"].getSelfdriveState().getExperimentalMode());
+
+  QLinearGradient bg(0, height, 0, 0);
 
   float v_ego = sm["carState"].getCarState().getVEgo();
 
@@ -116,7 +125,7 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
   auto now = std::chrono::steady_clock::now().time_since_epoch();
   float time_offset = std::chrono::duration_cast<std::chrono::milliseconds>(now).count() / 1000.0f; // seconds
 
-  if (experimental_mode) {
+  if (exp_mode_path) {
     // The first half of track_vertices are the points for the right side of the path
     const auto &acceleration = model.getAcceleration().getX();
     const int max_len = std::min<int>(track_vertices.length() / 2, acceleration.size());
